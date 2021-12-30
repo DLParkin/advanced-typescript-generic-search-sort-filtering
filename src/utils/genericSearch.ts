@@ -13,9 +13,9 @@ export default function genericSearch<T>(
 
     if (typeof value === "string" || typeof value === "number") {
       if (isCaseSensitive) {
-        return value.toString().toLowerCase().includes(query.toLowerCase());
-      } else {
         return value.toString().includes(query);
+      } else {
+        return value.toString().toLowerCase().includes(query.toLowerCase());
       }
     }
 
