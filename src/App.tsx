@@ -8,7 +8,8 @@ import people from "./mock-data/people";
 import widgets from "./mock-data/widgets";
 import genericSearch from "./utils/genericSearch";
 import genericSort from "./utils/genericSort";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Widget } from "./components/Renderers/Widget";
+import { Person } from "./components/Renderers/Person";
 
 function App() {
   const [query, setQuery] = useState<string>("");
@@ -32,7 +33,7 @@ function App() {
         )
         .sort((a, b) => genericSort(a, b, widgetProperty.property))
         .map((widget, index) => {
-          return <h3 key={index}>{widget.title}</h3>;
+          return <Widget {...widget} />;
         })}
       <h2>People:</h2>
       <SortInput
@@ -50,9 +51,7 @@ function App() {
         )
         .sort((a, b) => genericSort(a, b, personProperty.property))
         .map((person, index) => {
-          return (
-            <h3 key={index}>{`${person.firstName} ${person.lastName}`}</h3>
-          );
+          return <Person {...person} />;
         })}
     </>
   );
