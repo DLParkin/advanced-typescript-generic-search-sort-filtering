@@ -10,6 +10,8 @@ import genericSearch from "./utils/genericSearch";
 import genericSort from "./utils/genericSort";
 import { Widget } from "./components/Renderers/Widget";
 import { Person } from "./components/Renderers/Person";
+import genericFilter from "./utils/genericFilter";
+import { FilterInput } from "./components/FilterInput";
 
 function App() {
   const [showPeople, setShowPeople] = useState<boolean>(false);
@@ -21,10 +23,18 @@ function App() {
     isDescending: true,
   });
 
+  const [widgetFilterProperties, setWidgetFilterProperties] = useState<
+    Array<keyof IWidget>
+  >([]);
+
   const [personProperty, setPersonProperty] = useState<IProperty<IPerson>>({
     property: "firstName",
     isDescending: true,
   });
+
+  const [peopleFilterProperties, setPeopleFilterProperties] = useState<
+    Array<keyof IPerson>
+  >([]);
 
   return (
     <>
@@ -39,13 +49,32 @@ function App() {
             object={widgets[0]}
             setProperty={(propertyType) => setWidgetProperty(propertyType)}
           />
+          <br />
+          <FilterInput
+            object={widgets[0]}
+            properties={widgetFilterProperties}
+            onChangeFilter={(property) => {
+              widgetFilterProperties.includes(property)
+                ? setWidgetFilterProperties(
+                    widgetFilterProperties.filter(
+                      (widgetFilterProperty) =>
+                        widgetFilterProperty !== property
+                    )
+                  )
+                : setWidgetFilterProperties([
+                    ...widgetFilterProperties,
+                    property,
+                  ]);
+            }}
+          />
           {widgets
             .filter((widget) =>
               genericSearch(widget, ["title", "description"], query, false)
             )
+            .filter((widget) => genericFilter(widget, widgetFilterProperties))
             .sort((a, b) => genericSort(a, b, widgetProperty))
             .map((widget, index) => {
-              return <Widget {...widget} />;
+              return <Widget key={index} {...widget} />;
             })}
         </>
       ) : (
@@ -54,6 +83,24 @@ function App() {
           <SortInput
             object={people[0]}
             setProperty={(propertyType) => setPersonProperty(propertyType)}
+          />
+          <br />
+          <FilterInput
+            object={people[0]}
+            properties={peopleFilterProperties}
+            onChangeFilter={(property) => {
+              peopleFilterProperties.includes(property)
+                ? setPeopleFilterProperties(
+                    peopleFilterProperties.filter(
+                      (peopleFilterProperty) =>
+                        peopleFilterProperty !== property
+                    )
+                  )
+                : setPeopleFilterProperties([
+                    ...peopleFilterProperties,
+                    property,
+                  ]);
+            }}
           />
           {people
             .filter((person) =>
@@ -64,9 +111,10 @@ function App() {
                 false
               )
             )
+            .filter((person) => genericFilter(person, peopleFilterProperties))
             .sort((a, b) => genericSort(a, b, personProperty))
             .map((person, index) => {
-              return <Person {...person} />;
+              return <Person key={index} {...person} />;
             })}
         </>
       )}
