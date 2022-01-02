@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { SearchInput } from "./components/SearchInput";
 import { SortInput } from "./components/SortInput";
 import IPerson from "./interfaces/iPerson";
-import IProperty from "./interfaces/iProperty";
+import IProperty from "./interfaces/iSorter";
 import IWidget from "./interfaces/iWidget";
 import people from "./mock-data/people";
 import widgets from "./mock-data/widgets";
@@ -12,6 +12,7 @@ import { Widget } from "./components/Renderers/Widget";
 import { Person } from "./components/Renderers/Person";
 import genericFilter from "./utils/genericFilter";
 import { FilterInput } from "./components/FilterInput";
+import IFilter from "./interfaces/iFilter";
 
 function App() {
   const [showPeople, setShowPeople] = useState<boolean>(false);
@@ -24,7 +25,7 @@ function App() {
   });
 
   const [widgetFilterProperties, setWidgetFilterProperties] = useState<
-    Array<keyof IWidget>
+    Array<IFilter<IWidget>>
   >([]);
 
   const [personProperty, setPersonProperty] = useState<IProperty<IPerson>>({
@@ -33,7 +34,7 @@ function App() {
   });
 
   const [peopleFilterProperties, setPeopleFilterProperties] = useState<
-    Array<keyof IPerson>
+    Array<IFilter<IPerson>>
   >([]);
 
   return (
@@ -54,17 +55,37 @@ function App() {
             object={widgets[0]}
             properties={widgetFilterProperties}
             onChangeFilter={(property) => {
-              widgetFilterProperties.includes(property)
-                ? setWidgetFilterProperties(
-                    widgetFilterProperties.filter(
-                      (widgetFilterProperty) =>
-                        widgetFilterProperty !== property
-                    )
+              const propertyMatch = widgetFilterProperties.some(
+                (widgetFilterProperty) =>
+                  widgetFilterProperty.property === property.property
+              );
+              const fullMatch = widgetFilterProperties.some(
+                (widgetFilterProperty) =>
+                  widgetFilterProperty.property === property.property &&
+                  widgetFilterProperty.isTruthySelected ===
+                    property.isTruthySelected
+              );
+              if (fullMatch) {
+                setWidgetFilterProperties(
+                  widgetFilterProperties.filter(
+                    (widgetFilterProperty) =>
+                      widgetFilterProperty.property !== property.property
                   )
-                : setWidgetFilterProperties([
-                    ...widgetFilterProperties,
-                    property,
-                  ]);
+                );
+              } else if (propertyMatch) {
+                setWidgetFilterProperties([
+                  ...widgetFilterProperties.filter(
+                    (widgetFilterProperty) =>
+                      widgetFilterProperty.property !== property.property
+                  ),
+                  property,
+                ]);
+              } else {
+                setWidgetFilterProperties([
+                  ...widgetFilterProperties,
+                  property,
+                ]);
+              }
             }}
           />
           {widgets
