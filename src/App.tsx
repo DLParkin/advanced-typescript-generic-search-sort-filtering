@@ -33,10 +33,6 @@ function App() {
     isDescending: true,
   });
 
-  const [peopleFilterProperties, setPeopleFilterProperties] = useState<
-    Array<IFilter<IPerson>>
-  >([]);
-
   return (
     <>
       <button onClick={() => setShowPeople(!showPeople)}>
