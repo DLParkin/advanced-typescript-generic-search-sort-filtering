@@ -106,23 +106,6 @@ function App() {
             setProperty={(propertyType) => setPersonProperty(propertyType)}
           />
           <br />
-          <FilterInput
-            object={people[0]}
-            properties={peopleFilterProperties}
-            onChangeFilter={(property) => {
-              peopleFilterProperties.includes(property)
-                ? setPeopleFilterProperties(
-                    peopleFilterProperties.filter(
-                      (peopleFilterProperty) =>
-                        peopleFilterProperty !== property
-                    )
-                  )
-                : setPeopleFilterProperties([
-                    ...peopleFilterProperties,
-                    property,
-                  ]);
-            }}
-          />
           {people
             .filter((person) =>
               genericSearch(
@@ -132,7 +115,6 @@ function App() {
                 false
               )
             )
-            .filter((person) => genericFilter(person, peopleFilterProperties))
             .sort((a, b) => genericSort(a, b, personProperty))
             .map((person, index) => {
               return <Person key={index} {...person} />;
